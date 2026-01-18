@@ -1,0 +1,6 @@
+#define _POSIX_C_SOURCE
+char *buff = NULL;
+char size = 0;
+ssize_t num_char = getline(&buff, &size, stdin);
+
+free(buff);
