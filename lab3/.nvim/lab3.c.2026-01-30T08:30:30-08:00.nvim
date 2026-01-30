@@ -1,0 +1,65 @@
+#define _POSIX_C_SOURCE 200809L
+#include <stdio.h>
+#include <stdlib.h>
+#include <string.h>
+
+void add(char *history[], int *count, int *nextIndex, char *line) {
+  if (history[*nextIndex] != NULL) {
+    free(history[*nextIndex]);
+  }
+  history[*nextIndex] = line;
+  if (*count < 5) {
+    (*count)++;
+  }
+  *nextIndex = (*nextIndex + 1) % 5;
+}
+
+int isPrint(char *line) {
+  if (strcmp(line, "print\n") == 0) {
+    return 1;
+  } else {
+    return 0;
+  }
+}
+
+void print(char *history[], int count, int nextIndex) {
+  int startingIndex = nextIndex - count;
+  if (startingIndex < 0) {
+    startingIndex += 5;
+  }
+  for (int i = 0; i < count; i++) {
+    int index = (startingIndex + i) % 5;
+    if (history[index] != NULL) {
+      printf("%s", history[index]);
+    }
+  }
+}
+
+int main() {
+  char *history[5] = {NULL};
+  int count = 0; // how many lines added
+  int nextIndex = 0; // write at where
+
+  while (1) {
+    printf("Enter input: ");
+
+    char *buff = NULL;
+    size_t size = 0;
+    ssize_t num_char = getline(&buff, &size, stdin);
+
+    if (num_char == -1) {
+      free(buff);
+      break;
+    }
+
+    printf("%s", buff);
+    add(history, &count, &nextIndex, buff);
+    if (isPrint(buff)) {
+      print(history, count, nextIndex);
+    }
+  }
+  for (int i = 0; i < 5; i++) {
+    free(history[i]);
+  }
+  return 0;
+}
